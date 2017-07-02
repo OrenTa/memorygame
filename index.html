@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>My Games</title>
+		<link rel="stylesheet" href="css/style.css">
+		<script src="js/libs/jquery.min.js"></script>
+		<script src="js/libs/mustache.js"></script>
+	</head>
+	<body>	
+		<div class="toprow">
+			<h1>
+				MEMORY GAME
+			</h1>
+		</div>
+		<div class="blockrow"></div>
+		<div class="container" id="container">
+		</div>
+		
+		<script id="rowtemplate" type="x-tmpl-mustach">
+    		<div class="row" id="row">
+			</div>
+		</script>
+		<script id="imgtemplate" type="x-tmpl-mustach">
+			<div class="imgcontainer" id="{{ idxy }}">
+				<img class="img" src="{{ imgsrc }}">
+			</div>
+		</script>
+		
+		<script src="js/app.js"></script>
+	</body>
+</html>
