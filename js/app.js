@@ -5,12 +5,14 @@ const sets = 8;
 var matrix = [];
 var counter = 0;
 var firstClicked = false;
-var firstCard = null;
+var firstRevealed = [0,0];
 var i = 0;
+var allow_continue = true;
 const BACK_CARD = "images/back.jpg";
 
 initMatrix();
 initScreen();
+//$("#card").flip();
 
 function initScreen() {
   
@@ -27,9 +29,9 @@ function initScreen() {
 		$('#container').append(rendered);		
 		rendered = Mustache.render(imgtemplate, {imgsrc: BACK_CARD });
 		for (x = 0; x < (sets/2) ; x++) {
-			rendered = Mustache.render(imgtemplate, {imgsrc: "images/back.jpg", idxy:y+x*10});
+			rendered = Mustache.render(imgtemplate, {imgsrc: BACK_CARD, idxy:y+x*10});
 			$temp = $(rendered)
-			$temp.click( function(xcopy,ycopy,thiscopy) {
+			$temp.find( "img" ).click( function(xcopy,ycopy) {
 				return function() {
 					click_handler(xcopy,ycopy)
 				}
@@ -37,32 +39,70 @@ function initScreen() {
 			$('#container #row:nth-child(' + (y+1) + ')').append($temp);
         }
     }
+}
+
+// used to remove click handler from revealed cards
+function removeClickHandler (x,y) {
+	//$('click','#' + (y+x*10) + ' img').unbind();
+	//$('click','#' + (y+x*10)).find( "img" ).unbind();
+	$('click','#' + (y+x*10) + ' img').click( function () {
+		alert('i do nothing');
+	});
 
 }
 
+// runs logic
+// updates the matrix
+// calls the screen/card updates
 function click_handler(xx,yy) {
-	//matrix_flip_card(xx,yy);
-	//screen_update_card();
-	temp_screen_show_card(xx,yy);
-	//cardd.children[0].src="images/" + matrix[xx-1][yy-1].imgNum + ".jpg";
+	var img;
+	var xp,xy;
+	
+    if (firstClicked) {
+        allow_continue = false;
+        firstClicked = false;
+		xp=firstRevealed[0];
+		yp=firstRevealed[1];
+        img = 'images/' + matrix[xx][yy].imgNum + '.jpg'
+        screen_update_card(xx,yy,img);
+        //check if found matching cards
+        if (matrix[xx][yy].imgNum == matrix[xp][yp].imgNum) {
+            console.log('תותח');
+            // (1) update points
+            matrix[xx][yy].faceUp = true;
+            matrix[xp][yp].faceUp = true;
+			removeClickHandler(xx,yy);
+			removeClickHandler(xp,yp);
+            firstRevealed = [0,0];
+            allow_continue = true;
+            // (3) tell view to clear handlers to specific cards
+        }
+        else { // cards do not match - flip back
+            setTimeout(function(){
+                screen_update_card(xx,yy,BACK_CARD);
+                screen_update_card(firstRevealed[0],firstRevealed[1],BACK_CARD);
+                firstRevealed = [0,0];
+                allow_continue = true;
+            }, 1500);
+        }
+    }
+    else { //if this is the first card clicked
+        if (allow_continue) {
+            firstClicked = true;
+            firstRevealed = [xx,yy];
+            img = 'images/' + matrix[xx][yy].imgNum + '.jpg'
+            screen_update_card(xx,yy,img);
+        }
+    }
 }
 
 //view function
-function temp_screen_show_card(x,y) {
-	$('#' + (y+x*10) + ' img').attr('src', 'images/' + matrix[x][y].imgNum + '.jpg');	
-	console.log(x+1);
+function screen_update_card(x,y,img) {
+	$('#' + (y+x*10) + ' img').attr('src', img);
 }
 
 function initMatrix() {
-    // there are #sets sets of cards
-    // I will create an array of 16 and ..
-    // fill the array 
-    // then use the array to fill the matrix
-    // first create a sorted array then 
-    // randomize an array
-
     var cards = [];
-
     for (i = 0; i < sets; i++) {
         cards.push(i);
         cards.push(i);
