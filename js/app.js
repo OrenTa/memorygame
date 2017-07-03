@@ -3,7 +3,7 @@
 
 const sets = 8;
 var matrix = [];
-var counter = 0;
+var score = 0;
 var firstClicked = false;
 var firstRevealed = [0,0];
 var i = 0;
@@ -31,7 +31,7 @@ function initScreen() {
 		for (x = 0; x < (sets/2) ; x++) {
 			rendered = Mustache.render(imgtemplate, {imgsrc: BACK_CARD, idxy:y+x*10});
 			$temp = $(rendered)
-			$temp.find( "img" ).click( function(xcopy,ycopy) {
+			$temp.find("img").click( function(xcopy,ycopy) {
 				return function() {
 					click_handler(xcopy,ycopy)
 				}
@@ -43,12 +43,7 @@ function initScreen() {
 
 // used to remove click handler from revealed cards
 function removeClickHandler (x,y) {
-	//$('click','#' + (y+x*10) + ' img').unbind();
-	//$('click','#' + (y+x*10)).find( "img" ).unbind();
-	$('click','#' + (y+x*10) + ' img').click( function () {
-		alert('i do nothing');
-	});
-
+	$('#' + (y+x*10) + ' img').off();
 }
 
 // runs logic
@@ -75,6 +70,8 @@ function click_handler(xx,yy) {
 			removeClickHandler(xp,yp);
             firstRevealed = [0,0];
             allow_continue = true;
+			score = score+10;
+			$('#score').text('SCORE:  ' + score);
             // (3) tell view to clear handlers to specific cards
         }
         else { // cards do not match - flip back
