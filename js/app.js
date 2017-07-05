@@ -1,5 +1,4 @@
 // TODO:
-// Add Github for hosting.
 // at the end of timer show overlay "end - click to try again" - like this https://www.w3schools.com/howto/howto_js_fullscreen_overlay.asp or probably better - this https://www.w3schools.com/howto/howto_css_overlay.asp
 // then add animation flip
 // add sound - https://www.w3schools.com/html/html5_audio.asp
@@ -18,11 +17,13 @@ var firstRevealed = [0,0];
 var i = 0;
 var allow_continue = true;
 var counter = 60;
+var cardsleft; //used to track how many cards left to solve all puzzle
 const BACK_CARD = "images/back.jpg";
 
 initMatrix();
 initScreen();
 //$("#card").flip();
+cardsleft = sets * 2;
 
 function initScreen() {
   
@@ -76,8 +77,6 @@ function click_handler(xx,yy) {
         screen_update_card(xx,yy,img);
         //check if found matching cards
         if (matrix[xx][yy].imgNum == matrix[xp][yp].imgNum) {
-            console.log('תותח');
-            // (1) update points
             matrix[xx][yy].faceUp = true;
             matrix[xp][yp].faceUp = true;
 			removeClickHandler(xx,yy);
@@ -85,8 +84,12 @@ function click_handler(xx,yy) {
             firstRevealed = [0,0];
             allow_continue = true;
 			score = score+10;
-			$('#score').text('SCORE:  ' + score);
-            // (3) tell view to clear handlers to specific cards
+			cardsleft = cardsleft - 2;
+			if (cardsleft ==0) {
+				document.getElementById("overlay").style.display = "block";
+				clearInterval(x);
+			}
+			// $('#score').text('SCORE:  ' + score); // score update if required.
         }
         else { // cards do not match - flip back
             setTimeout(function(){
