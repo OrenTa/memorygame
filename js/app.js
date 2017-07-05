@@ -1,5 +1,14 @@
-// using the mustache library of html templating
-// starting git also
+// TODO:
+// Add Github for hosting.
+// at the end of timer show overlay "end - click to try again" - like this https://www.w3schools.com/howto/howto_js_fullscreen_overlay.asp or probably better - this https://www.w3schools.com/howto/howto_css_overlay.asp
+// then add animation flip
+// add sound - https://www.w3schools.com/html/html5_audio.asp
+// conside building a state machine control
+// add general music and add success tone.
+// finish the first game
+// deploy
+// kill Amazon lightsale and Amazon in general
+// connect to something BIG like FB https://developers.facebook.com/docs/games
 
 const sets = 8;
 var matrix = [];
@@ -8,6 +17,7 @@ var firstClicked = false;
 var firstRevealed = [0,0];
 var i = 0;
 var allow_continue = true;
+var counter = 60;
 const BACK_CARD = "images/back.jpg";
 
 initMatrix();
@@ -52,6 +62,10 @@ function removeClickHandler (x,y) {
 function click_handler(xx,yy) {
 	var img;
 	var xp,xy;
+	var audio;
+	
+	audio = document.getElementById("clicksound");
+	audio.play();
 	
     if (firstClicked) {
         allow_continue = false;
@@ -115,6 +129,16 @@ function initMatrix() {
         }
     }
 }
+
+var x = setInterval(function() {
+	
+	document.getElementById("counter").innerHTML = counter;
+	counter = counter - 1;
+	if (counter < 1) {
+		clearInterval(x);
+		document.getElementById("counter").innerHTML = "EXPIRED";
+	}
+}, 1000);
 
 
 // helper functions
