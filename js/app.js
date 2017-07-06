@@ -1,5 +1,7 @@
 // TODO:
 // then add animation flip
+// add handler to the overlay in init screen
+// define clearscreen
 // conside building a state machine control
 // add general music and add success tone.
 // finish the first game
@@ -14,7 +16,8 @@ var firstClicked = false;
 var firstRevealed = [0,0];
 var i = 0;
 var allow_continue = true;
-var counter = 60;
+var counter;
+var imagesLocation;
 var cardsleft; //used to track how many cards left to solve all puzzle
 const BACK_CARD = "images/back.jpg";
 
@@ -23,6 +26,7 @@ clickaudio = document.getElementById("clicksound");
 
 initMatrix();
 initScreen();
+StartGame(10);
 cardsleft = sets * 2;
 
 function initScreen() {
@@ -34,12 +38,20 @@ function initScreen() {
 	var x;
 	var y;
 	
-  	Mustache.parse(imgtemplate);   // optional, speeds up future uses
+	if (Math.random()>0.5) {
+		imagesLocation = 'images/animals/';
+	}
+	else {
+		imagesLocation = 'images/smiles/';
+	}
+	
+  	$('#overlay').click(startOver);
+	Mustache.parse(imgtemplate);   // optional, speeds up future uses
 	for (y = 0; y < (sets/2) ; y++) {
         rendered = Mustache.render(rowtemplate);
 		$('#container').append(rendered);		
 		for (x = 0; x < (sets/2) ; x++) {
-			rendered = Mustache.render(imgtemplate, {imgsrcb: 'images/' + matrix[x][y].imgNum + '.jpg', imgsrcf:BACK_CARD, idxy:y+x*10});
+			rendered = Mustache.render(imgtemplate, {imgsrcb: imagesLocation + matrix[x][y].imgNum + '.jpg', imgsrcf:BACK_CARD, idxy:y+x*10});
 			$temp = $(rendered)
 			$temp.find("img").click( function(xcopy,ycopy) {
 				return function() {
@@ -57,7 +69,6 @@ function removeClickHandler (x,y) {
 	$('#' + (y+x*10) + ' img').off();
 	screen_update_card(x,y,true);
 	$('#' + (y+x*10)).off();
-	console.log('removed:' + x, y);
 }
 
 
@@ -75,7 +86,6 @@ function click_handler(xx,yy) {
         firstClicked = false;
 		xp=firstRevealed[0];
 		yp=firstRevealed[1];
-        //img = 'images/' + matrix[xx][yy].imgNum + '.jpg'
         //check if found matching cards
         if (matrix[xx][yy].imgNum == matrix[xp][yp].imgNum) {
             matrix[xx][yy].faceUp = true;
@@ -90,7 +100,6 @@ function click_handler(xx,yy) {
 				document.getElementById("overlay").style.display = "block";
 				clearInterval(x);
 			}
-			// $('#score').text('SCORE:  ' + score); // score update if required.
         }
         else { // cards do not match - flip back
             setTimeout(function(){
@@ -135,16 +144,50 @@ function initMatrix() {
     }
 }
 
-var x = setInterval(function() {
-	
-	document.getElementById("counter").innerHTML = counter;
-	counter = counter - 1;
-	if (counter < 1) {
-		clearInterval(x);
-		document.getElementById("counter").innerHTML = "EXPIRED";
-	}
-}, 1000);
+// the counter function
+function StartGame (seconds) {
+	counter = seconds;
+	updateCounter();
+	var x = setInterval(function() {
+		counter = counter - 1;
+		if (counter < 1) {
+			clearInterval(x);
+			showEndGame();
+		}
+		else {
+			updateCounter();
+		}
+	}, 1000);
+}
 
+// view function
+function updateCounter() {
+	document.getElementById("counter").innerHTML = counter;
+}
+
+// view function
+function showEndGame() {
+	document.getElementById("counter").innerHTML = "EXPIRED";
+	document.getElementById("overlaytext").innerHTML = 'נגמר הזמן - נסה שנית';
+	document.getElementById("overlay").style.display = "block";
+}
+
+// control function
+// called upon click at end game
+function startOver (){
+	document.getElementById("overlay").style.display = "none";
+	//should clear all the divs that were created in previous initscreen
+	clearScreen(); // define this
+	initMatrix();
+	initScreen();
+	StartGame(10);
+}
+
+// view function
+// clears all previous images for a new try
+function clearScreen() {
+	$('#container').empty();
+}
 
 // helper functions
 ///////////////////////////////////////////////
