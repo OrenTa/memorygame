@@ -6,8 +6,8 @@
 		<link rel="stylesheet" href="css/style.css">
 		<link href="https://fonts.googleapis.com/css?family=Heebo" rel="stylesheet">
 		<script src="js/libs/jquery.min.js"></script>
-		<script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"> </script>
 		<script src="js/libs/mustache.js"></script>
+		<script src="https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js"> </script>
 	</head>
 	<body>	
 		<div class="toprow">
@@ -20,8 +20,10 @@
 		</div>
 		<div class="blockrow">
 		</div>
+			
 		<div class="container" id="container">
 		</div>
+		
 		
 		<div id="overlay">
 			<div id="overlaytext" dir="rtl" lang="he">כל הכבוד ! </div>
@@ -35,10 +37,14 @@
 		</script>
 		<script id="imgtemplate" type="x-tmpl-mustach">
 			<div class="imgcontainer" id="{{ idxy }}">
-				<img class="img" src="{{ imgsrc }}">
+				<div class="front">
+					<img class="img" src="{{ imgsrcf }}">
+				</div>
+				<div class="back">
+					<img class="img" src="{{ imgsrcb }}">
+				</div>
 			</div>
 		</script>
-		
 		<script src="js/app.js"></script>
 	</body>
 </html>

@@ -93,7 +93,7 @@ img {
 }
 
 #overlaytext{
-    position: absolute;
+	position: absolute;
 	font-family: 'Heebo', sans-serif;
     top: 50%;
     left: 50%;

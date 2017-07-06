@@ -1,7 +1,5 @@
 // TODO:
-// at the end of timer show overlay "end - click to try again" - like this https://www.w3schools.com/howto/howto_js_fullscreen_overlay.asp or probably better - this https://www.w3schools.com/howto/howto_css_overlay.asp
 // then add animation flip
-// add sound - https://www.w3schools.com/html/html5_audio.asp
 // conside building a state machine control
 // add general music and add success tone.
 // finish the first game
@@ -20,9 +18,11 @@ var counter = 60;
 var cardsleft; //used to track how many cards left to solve all puzzle
 const BACK_CARD = "images/back.jpg";
 
+var audio;
+clickaudio = document.getElementById("clicksound");
+
 initMatrix();
 initScreen();
-//$("#card").flip();
 cardsleft = sets * 2;
 
 function initScreen() {
@@ -38,9 +38,8 @@ function initScreen() {
 	for (y = 0; y < (sets/2) ; y++) {
         rendered = Mustache.render(rowtemplate);
 		$('#container').append(rendered);		
-		rendered = Mustache.render(imgtemplate, {imgsrc: BACK_CARD });
 		for (x = 0; x < (sets/2) ; x++) {
-			rendered = Mustache.render(imgtemplate, {imgsrc: BACK_CARD, idxy:y+x*10});
+			rendered = Mustache.render(imgtemplate, {imgsrcb: 'images/' + matrix[x][y].imgNum + '.jpg', imgsrcf:BACK_CARD, idxy:y+x*10});
 			$temp = $(rendered)
 			$temp.find("img").click( function(xcopy,ycopy) {
 				return function() {
@@ -48,6 +47,7 @@ function initScreen() {
 				}
 			}(x,y));
 			$('#container #row:nth-child(' + (y+1) + ')').append($temp);
+			$('#' + (y+x*10)).flip();
         }
     }
 }
@@ -55,7 +55,11 @@ function initScreen() {
 // used to remove click handler from revealed cards
 function removeClickHandler (x,y) {
 	$('#' + (y+x*10) + ' img').off();
+	screen_update_card(x,y,true);
+	$('#' + (y+x*10)).off();
+	console.log('removed:' + x, y);
 }
+
 
 // runs logic
 // updates the matrix
@@ -63,28 +67,25 @@ function removeClickHandler (x,y) {
 function click_handler(xx,yy) {
 	var img;
 	var xp,xy;
-	var audio;
 	
-	audio = document.getElementById("clicksound");
-	audio.play();
+	clickaudio.play();
 	
     if (firstClicked) {
         allow_continue = false;
         firstClicked = false;
 		xp=firstRevealed[0];
 		yp=firstRevealed[1];
-        img = 'images/' + matrix[xx][yy].imgNum + '.jpg'
-        screen_update_card(xx,yy,img);
+        //img = 'images/' + matrix[xx][yy].imgNum + '.jpg'
         //check if found matching cards
         if (matrix[xx][yy].imgNum == matrix[xp][yp].imgNum) {
             matrix[xx][yy].faceUp = true;
             matrix[xp][yp].faceUp = true;
-			removeClickHandler(xx,yy);
-			removeClickHandler(xp,yp);
             firstRevealed = [0,0];
             allow_continue = true;
 			score = score+10;
 			cardsleft = cardsleft - 2;
+			removeClickHandler(xx,yy);
+			removeClickHandler(xp,yp);
 			if (cardsleft ==0) {
 				document.getElementById("overlay").style.display = "block";
 				clearInterval(x);
@@ -93,8 +94,8 @@ function click_handler(xx,yy) {
         }
         else { // cards do not match - flip back
             setTimeout(function(){
-                screen_update_card(xx,yy,BACK_CARD);
-                screen_update_card(firstRevealed[0],firstRevealed[1],BACK_CARD);
+                screen_update_card(xx,yy,false);
+                screen_update_card(firstRevealed[0],firstRevealed[1],false);
                 firstRevealed = [0,0];
                 allow_continue = true;
             }, 1500);
@@ -104,15 +105,16 @@ function click_handler(xx,yy) {
         if (allow_continue) {
             firstClicked = true;
             firstRevealed = [xx,yy];
-            img = 'images/' + matrix[xx][yy].imgNum + '.jpg'
-            screen_update_card(xx,yy,img);
         }
+		else {
+			screen_update_card(xx,yy,true);
+		}
     }
 }
 
 //view function
-function screen_update_card(x,y,img) {
-	$('#' + (y+x*10) + ' img').attr('src', img);
+function screen_update_card(x,y,state) {
+	$('#' + (y+x*10)).flip(state);
 }
 
 function initMatrix() {
