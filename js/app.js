@@ -26,7 +26,7 @@ clickaudio = document.getElementById("clicksound");
 
 initMatrix();
 initScreen();
-StartGame(10);
+StartGame(60);
 cardsleft = sets * 2;
 
 function initScreen() {
@@ -60,9 +60,22 @@ function initScreen() {
 			}(x,y));
 			$('#container #row:nth-child(' + (y+1) + ')').append($temp);
 			$('#' + (y+x*10)).flip();
+			rotateIt(x,y);
         }
     }
 }
+
+// view function
+function rotateIt(x,y) {
+	//-ms-transform: rotate(20deg); /* IE 9 */
+    //-webkit-transform: rotate(20deg); /* Safari */
+    //transform: rotate(20deg);
+	$('#' + (y+x*10)).css( 'transform', 'translate(' + ((Math.random()*20)-10) + 'px,' + ((Math.random()*20)-10) + 'px)');
+	$('#' + (y+x*10)).css( 'transform', 'rotate(' + ((Math.random()*40)-20) + 'deg)');
+	//-ms-transform: translate(50px, 100px); /* IE 9 */
+    //-webkit-transform: translate(50px, 100px); /* Safari */
+}
+
 
 // used to remove click handler from revealed cards
 function removeClickHandler (x,y) {
@@ -105,6 +118,8 @@ function click_handler(xx,yy) {
             setTimeout(function(){
                 screen_update_card(xx,yy,false);
                 screen_update_card(firstRevealed[0],firstRevealed[1],false);
+				rotateIt(xx,yy);
+				rotateIt(xp,yp);
                 firstRevealed = [0,0];
                 allow_continue = true;
             }, 1500);
@@ -180,7 +195,7 @@ function startOver (){
 	clearScreen(); // define this
 	initMatrix();
 	initScreen();
-	StartGame(10);
+	StartGame(50);
 }
 
 // view function
